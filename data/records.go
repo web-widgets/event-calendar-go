@@ -26,6 +26,14 @@ type EventsDAO struct {
 	db *gorm.DB
 }
 
+
+func (d *EventsDAO) GetOne(id int) (Event, error) {
+	event := Event{}
+	err := d.db.Find(&event, id).Error
+
+	return event, err
+}
+
 func (d *EventsDAO) GetAll() ([]Event, error) {
 	events := make([]Event, 0)
 	err := d.db.Find(&events).Error

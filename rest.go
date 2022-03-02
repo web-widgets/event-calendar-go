@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"web-widgets/scheduler-go/api"
 	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
@@ -35,6 +36,13 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 			return
 		} else {
 			format.JSON(w, 200, Response{id})
+
+			e, _ := dao.Events.GetOne(id)
+			hub.Publish("events", api.EventConfig{
+				Type:  "add-event",
+				From:  getDeviceID(r),
+				Event: e,
+			})
 		}
 	})
 
@@ -51,6 +59,13 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 			return
 		} else {
 			format.JSON(w, 200, nil)
+
+			e, _ := dao.Events.GetOne(int(event.ID))
+			hub.Publish("events", api.EventConfig{
+				Type:  "update-event",
+				From:  getDeviceID(r),
+				Event: e,
+			})
 		}
 	})
 
@@ -63,6 +78,12 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 			return
 		} else {
 			format.JSON(w, 200, nil)
+
+			hub.Publish("events", api.EventConfig{
+				Type:  "delete-event",
+				From:  getDeviceID(r),
+				Event: data.Event{ID: id},
+			})
 		}
 	})
 
