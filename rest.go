@@ -1,7 +1,10 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"strconv"
+	"time"
 	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
@@ -62,4 +65,26 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 			format.JSON(w, 200, nil)
 		}
 	})
+
+	// DEMO ONLY, imitate login
+	r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
+		uid, _ := strconv.Atoi(r.URL.Query().Get("id"))
+		device := newDeviceID()
+		token, err := createUserToken(uid, device)
+		if err != nil {
+			log.Println("[token]", err.Error())
+		}
+		w.Write(token)
+	})
+}
+
+var dID int
+
+func init() {
+	dID = int(time.Now().Unix())
+}
+
+func newDeviceID() int {
+	dID += 1
+	return dID
 }
