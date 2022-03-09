@@ -30,7 +30,7 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 			return
 		}
 
-		id, err := dao.Events.Add(event.GetModel())
+		id, err := dao.Events.Add(&event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
@@ -46,21 +46,23 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
 		}
 	})
 
-	r.Put("/events", func(w http.ResponseWriter, r *http.Request) {
+	r.Put("/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+
 		event, err := ParseFormEvent(w, r)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
 		}
 
-		err = dao.Events.Update(event.GetModel())
+		err = dao.Events.Update(id, &event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
 		} else {
 			format.JSON(w, 200, nil)
 
-			e, _ := dao.Events.GetOne(int(event.ID))
+			e, _ := dao.Events.GetOne(int(id))
 			hub.Publish("events", api.EventConfig{
 				Type:  "update-event",
 				From:  getDeviceID(r),
