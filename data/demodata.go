@@ -12,7 +12,6 @@ type EventDemo struct {
 	Name      string          `json:"text"`
 	StartDate string          `json:"start_date"`
 	EndDate   string          `json:"end_date"`
-	Readonly  bool            `json:"readonly"`
 	AllDay    bool            `json:"allDay"`
 	Type      string          `json:"type"`
 	Details   string          `json:"details"`
@@ -27,7 +26,6 @@ func (d *EventDemo) GetModel() *Event {
 		Name:      d.Name,
 		StartDate: &sDate,
 		EndDate:   &eDate,
-		Readonly:  d.Readonly,
 		AllDay:    d.AllDay,
 		Type:      d.Type,
 		Details:   d.Details,

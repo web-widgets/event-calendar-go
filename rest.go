@@ -25,7 +25,7 @@ func initRoutes(r chi.Router, dao *data.DAO) {
 			return
 		}
 
-		id, err := dao.Events.Add(event.GetModel())
+		id, err := dao.Events.Add(&event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
@@ -34,14 +34,16 @@ func initRoutes(r chi.Router, dao *data.DAO) {
 		}
 	})
 
-	r.Put("/events", func(w http.ResponseWriter, r *http.Request) {
+	r.Put("/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+
 		event, err := ParseFormEvent(w, r)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
 		}
 
-		err = dao.Events.Update(event.GetModel())
+		err = dao.Events.Update(id, &event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
