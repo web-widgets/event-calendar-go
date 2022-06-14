@@ -2,25 +2,26 @@ package data
 
 import (
 	"time"
+	"web-widgets/scheduler-go/common"
 
 	"gorm.io/gorm"
 )
 
-func NewEventsDAO(db *gorm.DB) *EventsDAO {
-	return &EventsDAO{db}
-}
-
 type EventUpdate struct {
-	Name      string     `json:"text"`
-	StartDate *time.Time `json:"start_date"`
-	EndDate   *time.Time `json:"end_date"`
-	AllDay    bool       `json:"allDay"`
-	Type      string     `json:"type"`
-	Details   string     `json:"details"`
+	Name      string          `json:"text"`
+	StartDate *time.Time      `json:"start_date"`
+	EndDate   *time.Time      `json:"end_date"`
+	AllDay    bool            `json:"allDay"`
+	Type      common.FuzzyInt `json:"type"`
+	Details   string          `json:"details"`
 }
 
 type EventsDAO struct {
 	db *gorm.DB
+}
+
+func NewEventsDAO(db *gorm.DB) *EventsDAO {
+	return &EventsDAO{db}
 }
 
 func (d *EventsDAO) GetOne(id int) (Event, error) {
@@ -39,20 +40,20 @@ func (d *EventsDAO) GetAll() ([]Event, error) {
 
 func (d *EventsDAO) Add(update *EventUpdate) (int, error) {
 	event := Event{}
-	update.FillModel(&event)
+	update.fillModel(&event)
 
-	err := d.db.Save(&event).Error
+	err := d.db.Create(&event).Error
 	return event.ID, err
 }
 
 func (d *EventsDAO) Update(id int, update *EventUpdate) error {
 	event := Event{}
 	err := d.db.Find(&event, id).Error
-	if err != nil || event.ID == 0 {
+	if err != nil {
 		return err
 	}
 
-	update.FillModel(&event)
+	update.fillModel(&event)
 	err = d.db.Save(&event).Error
 	return err
 }
@@ -62,7 +63,7 @@ func (d *EventsDAO) Delete(id int) error {
 	return err
 }
 
-func (d *EventUpdate) FillModel(ev *Event) {
+func (d *EventUpdate) fillModel(ev *Event) {
 	if ev != nil {
 		ev.Name = d.Name
 		ev.StartDate = d.StartDate

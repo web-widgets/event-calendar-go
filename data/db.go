@@ -24,7 +24,8 @@ type DBConfig struct {
 type DAO struct {
 	db *gorm.DB
 
-	Events *EventsDAO
+	Events    *EventsDAO
+	Calendars *CalendarsDAO
 }
 
 func (d *DAO) GetDB() *gorm.DB {
@@ -47,10 +48,12 @@ func NewDAO(config DBConfig, url string) *DAO {
 	}
 
 	db.AutoMigrate(&Event{})
+	db.AutoMigrate(&Calendar{})
 
 	dao := &DAO{
-		db:     db,
-		Events: NewEventsDAO(db),
+		db:        db,
+		Events:    NewEventsDAO(db),
+		Calendars: NewCalendarsDAO(db),
 	}
 
 	if config.ResetOnStart {

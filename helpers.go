@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
 )
@@ -20,12 +19,10 @@ func NumberParam(r *http.Request, key string) int {
 	return num
 }
 
-func ParseFormEvent(w http.ResponseWriter, r *http.Request) (data.EventUpdate, error) {
-	c := data.EventUpdate{}
-
+func ParseForm(w http.ResponseWriter, r *http.Request, o interface{}) error {
 	body := http.MaxBytesReader(w, r.Body, 1048576)
 	dec := json.NewDecoder(body)
-	err := dec.Decode(&c)
+	err := dec.Decode(&o)
 
-	return c, err
+	return err
 }
