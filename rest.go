@@ -5,10 +5,9 @@ import (
 	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
-	remote "github.com/mkozhukh/go-remote"
 )
 
-func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
+func initRoutes(r chi.Router, dao *data.DAO) {
 
 	r.Get("/events", func(w http.ResponseWriter, r *http.Request) {
 		data, err := dao.Events.GetAll()

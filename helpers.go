@@ -29,9 +29,3 @@ func ParseFormEvent(w http.ResponseWriter, r *http.Request) (data.EventUpdate, e
 
 	return c, err
 }
-
-func getDeviceID(r *http.Request) int {
-	v := r.Context().Value("device_id")
-	asInt, _ := v.(int)
-	return asInt
-}
