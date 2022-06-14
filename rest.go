@@ -5,61 +5,107 @@ import (
 	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
-	remote "github.com/mkozhukh/go-remote"
 )
 
-func initRoutes(r chi.Router, dao *data.DAO, hub *remote.Hub) {
+func initRoutes(r chi.Router, dao *data.DAO) {
 
 	r.Get("/events", func(w http.ResponseWriter, r *http.Request) {
 		data, err := dao.Events.GetAll()
-		if err != nil {
-			format.Text(w, 500, err.Error())
-		} else {
-			format.JSON(w, 200, data)
-		}
+		sendResponse(w, data, err)
 	})
 
 	r.Post("/events", func(w http.ResponseWriter, r *http.Request) {
-		event, err := ParseFormEvent(w, r)
+		event := data.EventUpdate{}
+		err := ParseForm(w, r, &event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
 		}
 
-		id, err := dao.Events.Add(event.GetModel())
-		if err != nil {
-			format.Text(w, 500, err.Error())
-			return
-		} else {
-			format.JSON(w, 200, Response{id})
-		}
+		id, err := dao.Events.Add(&event)
+		sendResponse(w, Response{id}, err)
 	})
 
-	r.Put("/events", func(w http.ResponseWriter, r *http.Request) {
-		event, err := ParseFormEvent(w, r)
+	r.Put("/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+		event := data.EventUpdate{}
+		err := ParseForm(w, r, &event)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
 		}
 
-		err = dao.Events.Update(event.GetModel())
-		if err != nil {
-			format.Text(w, 500, err.Error())
-			return
-		} else {
-			format.JSON(w, 200, nil)
-		}
+		err = dao.Events.Update(id, &event)
+		sendResponse(w, nil, err)
 	})
 
 	r.Delete("/events/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := NumberParam(r, "id")
-
 		err := dao.Events.Delete(id)
+		sendResponse(w, nil, err)
+	})
+
+	r.Get("/calendars", func(w http.ResponseWriter, r *http.Request) {
+		data, err := dao.Calendars.GetAll()
+		sendResponse(w, data, err)
+	})
+
+	r.Post("/calendars", func(w http.ResponseWriter, r *http.Request) {
+		calendar := data.CalendarUpdate{}
+		err := ParseForm(w, r, &calendar)
 		if err != nil {
 			format.Text(w, 500, err.Error())
 			return
-		} else {
-			format.JSON(w, 200, nil)
+		}
+
+		id, err := dao.Calendars.Add(&calendar)
+		sendResponse(w, Response{id}, err)
+	})
+
+	r.Put("/calendars/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+		calendar := data.CalendarUpdate{}
+		err := ParseForm(w, r, &calendar)
+		if err != nil {
+			format.Text(w, 500, err.Error())
+			return
+		}
+
+		err = dao.Calendars.Update(id, &calendar)
+		sendResponse(w, nil, err)
+	})
+
+	r.Delete("/calendars/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+		err := dao.Calendars.Delete(id)
+		sendResponse(w, nil, err)
+	})
+
+	r.Get("/uploads/{id}/{name}", func(w http.ResponseWriter, r *http.Request) {
+		res, err := dao.Files.ToResponse(w, NumberParam(r, "id"))
+
+		if err != nil {
+			format.Text(w, 500, err.Error())
+		} else if !res {
+			format.Text(w, 500, "")
 		}
 	})
+
+	r.Post("/uploads", func(w http.ResponseWriter, r *http.Request) {
+		rec, err := dao.Files.FromRequest(r, "upload")
+		if err != nil {
+			format.Text(w, 500, err.Error())
+		} else {
+			format.JSON(w, 200, rec)
+		}
+	})
+
+}
+
+func sendResponse(w http.ResponseWriter, data interface{}, err error) {
+	if err != nil {
+		format.Text(w, 500, err.Error())
+	} else {
+		format.JSON(w, 200, data)
+	}
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"web-widgets/scheduler-go/api"
 	"web-widgets/scheduler-go/data"
 
 	"github.com/go-chi/chi"
@@ -22,7 +21,7 @@ var Config AppConfig
 func main() {
 	configor.New(&configor.Config{ENVPrefix: "APP", Silent: true}).Load(&Config, "config.yml")
 
-	dao := data.NewDAO(Config.DB, Config.Server.URL)
+	dao := data.NewDAO(Config.DB, Config.Server.URL, Config.BinaryData)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -41,11 +40,7 @@ func main() {
 		r.Use(c.Handler)
 	}
 
-	apiServer := api.BuildAPI(dao)
-	r.Get("/api/v1", apiServer.ServeHTTP)
-	r.Post("/api/v1", apiServer.ServeHTTP)
-
-	initRoutes(r, dao, apiServer.Events)
+	initRoutes(r, dao)
 
 	log.Printf("Starting webserver at port " + Config.Server.Port)
 	err := http.ListenAndServe(Config.Server.Port, r)
