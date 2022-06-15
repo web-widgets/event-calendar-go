@@ -3,67 +3,73 @@ package data
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"time"
-	"web-widgets/scheduler-go/common"
 )
 
 type EventDemo struct {
-	ID        common.FuzzyInt `json:"id"`
-	Name      string          `json:"text"`
-	StartDate string          `json:"start_date"`
-	EndDate   string          `json:"end_date"`
-	Readonly  bool            `json:"readonly"`
-	AllDay    bool            `json:"allDay"`
-	Type      string          `json:"type"`
-	Details   string          `json:"details"`
+	ID int `json:"id"`
+	EventUpdate
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
+}
+
+func dataDown(d *DAO) {
+	d.mustExec("DELETE from events")
+	d.mustExec("DELETE from calendars")
+}
+
+func dataUp(d *DAO) (err error) {
+	tempEvents := make([]EventDemo, 0)
+	err = parseDemodata(&tempEvents, "./demodata/events.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	events := make([]Event, len(tempEvents))
+	for i := range tempEvents {
+		events[i] = *tempEvents[i].GetModel()
+	}
+
+	calendars := make([]Calendar, 0)
+	err = parseDemodata(&calendars, "./demodata/calendars.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db := d.GetDB()
+	err = db.Create(&calendars).Error
+	if err != nil {
+		return err
+	}
+	err = db.Create(&events).Error
+
+	return
+}
+
+func parseDemodata(dest interface{}, path string) error {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		logError(err)
+		return err
+	}
+	err = json.Unmarshal(bytes, &dest)
+	if err != nil {
+		logError(err)
+	}
+	return err
 }
 
 func (d *EventDemo) GetModel() *Event {
 	sDate, _ := time.Parse("2006-01-02 15:04:05", d.StartDate)
 	eDate, _ := time.Parse("2006-01-02 15:04:05", d.EndDate)
 
-	return &Event{
-		ID:        int(d.ID),
-		Name:      d.Name,
-		StartDate: &sDate,
-		EndDate:   &eDate,
-		Readonly:  d.Readonly,
-		AllDay:    d.AllDay,
-		Type:      d.Type,
-		Details:   d.Details,
-	}
-}
-
-func getData() ([]EventDemo, error) {
-	bytes, err := ioutil.ReadFile("./demodata/events.json")
-	if err != nil {
-		logError(err)
-		return nil, err
-	}
-	data := make([]EventDemo, 0)
-	err = json.Unmarshal(bytes, &data)
-
-	return data, err
-}
-
-func dataDown(d *DAO) {
-	d.mustExec("DELETE from events")
-}
-
-func dataUp(d *DAO) error {
-	db := d.GetDB()
-	events, err := getData()
-	if err != nil {
-		logError(err)
-		return err
+	event := Event{
+		ID:          d.ID,
+		EventUpdate: d.EventUpdate,
 	}
 
-	tx := db.Begin()
-	for _, r := range events {
-		err = tx.Create(r.GetModel()).Error
-		if err != nil {
-			return err
-		}
-	}
-	return tx.Commit().Error
+	event.StartDate = &sDate
+	event.EndDate = &eDate
+
+	return &event
 }
