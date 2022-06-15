@@ -19,11 +19,11 @@ func NewCalendarsDAO(db *gorm.DB) *CalendarsDAO {
 	return &CalendarsDAO{db}
 }
 
-func (d *CalendarsDAO) GetOne(id int) (Calendar, error) {
+func (d *CalendarsDAO) GetOne(id int) (*Calendar, error) {
 	calendar := Calendar{}
 	err := d.db.Find(&calendar, id).Error
 
-	return calendar, err
+	return &calendar, err
 }
 
 func (d *CalendarsDAO) GetAll() ([]Calendar, error) {
