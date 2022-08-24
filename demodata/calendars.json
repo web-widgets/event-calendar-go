@@ -1,0 +1,38 @@
+[
+	{
+		"id":1,
+		"label": "Work",
+		"active": true,
+		"color": {
+			"background": "#cee8f8",
+			"border": "#098CDC"
+		}
+	},
+	{
+		"id": 2,
+		"label": "Meeting",
+		"active": true,
+		"color": {
+			"background": "#e4e1fb",
+			"border": "#7A67EB"
+		}
+	},
+	{
+		"id": 3,
+		"label": "Rest",
+		"active": true,
+		"color": {
+			"background": "#efdaee",
+			"border": "#AD44AB"
+		}
+	},
+	{
+		"id": 4,
+		"label": "Movie",
+		"active": true,
+		"color": {
+			"background": "#e4f6dd",
+			"border": "#77D257"
+		}
+	}
+]
