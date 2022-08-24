@@ -1,6 +1,6 @@
 .idea
 .vscode
-cheduler-go
+scheduler-go
 db.sqlite
 application*
 __debug_bin
