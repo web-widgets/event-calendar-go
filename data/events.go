@@ -14,7 +14,7 @@ type EventUpdate struct {
 	AllDay       bool            `json:"allDay"`
 	Type         common.FuzzyInt `json:"type"`
 	Details      string          `json:"details"`
-	AttachedData []*BinaryData   `json:"img"`
+	AttachedData []*BinaryData   `json:"files"`
 }
 
 type EventsDAO struct {
