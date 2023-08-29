@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,6 +41,28 @@ func main() {
 		})
 		r.Use(c.Handler)
 	}
+
+	// auth
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			token := r.Header.Get("Remote-Token")
+			if token == "" {
+				if r.Method == http.MethodGet {
+					token = r.URL.Query().Get("token")
+				}
+			}
+
+			if token != "" {
+				id, device, err := verifyUserToken([]byte(token))
+				if err != nil {
+					log.Println("[token]", err.Error())
+				} else {
+					r = r.WithContext(context.WithValue(context.WithValue(r.Context(), "user_id", id), "device_id", device))
+				}
+			}
+			next.ServeHTTP(w, r)
+		})
+	})
 
 	apiServer := api.BuildAPI(dao)
 	r.Get("/api/v1", apiServer.ServeHTTP)

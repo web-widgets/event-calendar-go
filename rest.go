@@ -158,7 +158,7 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 			log.Println("[token]", err.Error())
 			format.Text(w, 500, err.Error())
 		} else {
-			format.JSON(w, 200, token)
+			w.Write(token)
 		}
 	})
 }
