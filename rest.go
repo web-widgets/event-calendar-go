@@ -81,18 +81,6 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 		}
 	})
 
-	r.Delete("/calendars/{id}", func(w http.ResponseWriter, r *http.Request) {
-		id := NumberParam(r, "id")
-		err := dao.Events.Delete(id)
-		if sendResponse(w, nil, err) {
-			hub.Publish("events", api.EventItem{
-				Type:  "delete-event",
-				From:  getDeviceID(r),
-				Event: &data.Event{ID: id},
-			})
-		}
-	})
-
 	r.Get("/calendars", func(w http.ResponseWriter, r *http.Request) {
 		data, err := dao.Calendars.GetAll()
 		sendResponse(w, data, err)
