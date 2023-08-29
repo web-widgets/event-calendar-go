@@ -149,6 +149,25 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 		}
 	})
 
+	r.Get("/uploads/{id}/{name}", func(w http.ResponseWriter, r *http.Request) {
+		res, err := dao.Files.ToResponse(w, NumberParam(r, "id"))
+
+		if err != nil {
+			format.Text(w, 500, err.Error())
+		} else if !res {
+			format.Text(w, 500, "")
+		}
+	})
+
+	r.Post("/uploads", func(w http.ResponseWriter, r *http.Request) {
+		rec, err := dao.Files.FromRequest(r, "upload")
+		if err != nil {
+			format.Text(w, 500, err.Error())
+		} else {
+			format.JSON(w, 200, rec)
+		}
+	})
+
 	// DEMO ONLY, imitate login
 	r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
 		uid, _ := strconv.Atoi(r.URL.Query().Get("id"))
