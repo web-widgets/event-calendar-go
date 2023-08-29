@@ -18,6 +18,11 @@ func init() {
 	dID = int(time.Now().Unix())
 }
 
+func newDeviceID() int {
+	dID += 1
+	return dID
+}
+
 func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 
 	r.Get("/events", func(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +70,18 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 	})
 
 	r.Delete("/events/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := NumberParam(r, "id")
+		err := dao.Events.Delete(id)
+		if sendResponse(w, nil, err) {
+			hub.Publish("events", api.EventItem{
+				Type:  "delete-event",
+				From:  getDeviceID(r),
+				Event: &data.Event{ID: id},
+			})
+		}
+	})
+
+	r.Delete("/calendars/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := NumberParam(r, "id")
 		err := dao.Events.Delete(id)
 		if sendResponse(w, nil, err) {
@@ -139,8 +156,10 @@ func initRoutes(r chi.Router, dao *data.DAO, hub *go_remote.Hub) {
 		token, err := createUserToken(uid, device)
 		if err != nil {
 			log.Println("[token]", err.Error())
+			format.Text(w, 500, err.Error())
+		} else {
+			format.JSON(w, 200, token)
 		}
-		w.Write(token)
 	})
 }
 
@@ -151,9 +170,4 @@ func sendResponse(w http.ResponseWriter, data interface{}, err error) bool {
 		format.JSON(w, 200, data)
 	}
 	return err == nil
-}
-
-func newDeviceID() int {
-	dID += 1
-	return dID
 }

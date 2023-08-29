@@ -17,6 +17,7 @@ type EventDemo struct {
 func dataDown(d *DAO) {
 	d.mustExec("DELETE from events")
 	d.mustExec("DELETE from calendars")
+	d.mustExec("DELETE from binary_data")
 }
 
 func dataUp(d *DAO) (err error) {

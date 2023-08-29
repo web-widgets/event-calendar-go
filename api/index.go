@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	remote "github.com/mkozhukh/go-remote"
-
 	"web-widgets/scheduler-go/data"
 )
 

@@ -19,8 +19,7 @@ func (c *Color) Scan(value interface{}) error {
 
 	if s, err := driver.String.ConvertValue(value); err == nil {
 		if v, ok := s.(string); ok {
-			err = json.Unmarshal([]byte(v), c)
-			return nil
+			return json.Unmarshal([]byte(v), c)
 		}
 	}
 
