@@ -1,38 +1,38 @@
 [
-	{
-		"id":1,
-		"label": "Work",
-		"active": true,
-		"color": {
-			"background": "#cee8f8",
-			"border": "#098CDC"
-		}
-	},
-	{
-		"id": 2,
-		"label": "Meeting",
-		"active": true,
-		"color": {
-			"background": "#e4e1fb",
-			"border": "#7A67EB"
-		}
-	},
-	{
-		"id": 3,
-		"label": "Rest",
-		"active": true,
-		"color": {
-			"background": "#efdaee",
-			"border": "#AD44AB"
-		}
-	},
-	{
-		"id": 4,
-		"label": "Movie",
-		"active": true,
-		"color": {
-			"background": "#e4f6dd",
-			"border": "#77D257"
-		}
-	}
+  {
+    "id": 1,
+    "active": true,
+    "label": "Work",
+    "color": {
+      "background": "#3AA3E3",
+      "border": "#098CDC"
+    }
+  },
+  {
+    "id": 2,
+    "active": true,
+    "label": "Meeting",
+    "color": {
+      "background": "#9585EF",
+      "border": "#7A67EB"
+    }
+  },
+  {
+    "id": 3,
+    "active": true,
+    "label": "Rest",
+    "color": {
+      "background": "#BD69BC",
+      "border": "#AD44AB"
+    }
+  },
+  {
+    "id": 4,
+    "active": true,
+    "label": "Movie",
+    "color": {
+      "background": "#84BF70",
+      "border": "#61A649"
+    }
+  }
 ]

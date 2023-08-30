@@ -17,6 +17,7 @@ type EventDemo struct {
 func dataDown(d *DAO) {
 	d.mustExec("DELETE from events")
 	d.mustExec("DELETE from calendars")
+	d.mustExec("DELETE from binary_data")
 }
 
 func dataUp(d *DAO) (err error) {
@@ -60,8 +61,8 @@ func parseDemodata(dest interface{}, path string) error {
 }
 
 func (d *EventDemo) GetModel() *Event {
-	sDate, _ := time.Parse("2006-01-02 15:04:05", d.StartDate)
-	eDate, _ := time.Parse("2006-01-02 15:04:05", d.EndDate)
+	sDate, _ := time.Parse("2006-01-02T15:04:05", d.StartDate)
+	eDate, _ := time.Parse("2006-01-02T15:04:05", d.EndDate)
 
 	event := Event{
 		ID:          d.ID,
