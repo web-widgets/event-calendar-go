@@ -26,3 +26,9 @@ func ParseForm(w http.ResponseWriter, r *http.Request, o interface{}) error {
 
 	return err
 }
+
+func getDeviceID(r *http.Request) int {
+	v := r.Context().Value("device_id")
+	asInt, _ := v.(int)
+	return asInt
+}
